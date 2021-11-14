@@ -49,7 +49,7 @@ func NewDefaultConfig() (*Config, error) {
 		Namespaces:       nil,
 		Logger: log.NewZapLogger(log.BuildZapLogger(log.Config{
 			Stdout:     true,
-			Level:      "debug",
+			Level:      "info",
 			OutputFile: "",
 		})),
 		portProvider: &portProvider{},
@@ -106,7 +106,7 @@ func Convert(cfg *Config) *config.Config {
 		Persistence: config.Persistence{
 			DefaultStore:     PersistenceStoreName,
 			VisibilityStore:  PersistenceStoreName,
-			NumHistoryShards: 1,
+			NumHistoryShards: 8,
 			DataStores: map[string]config.DataStore{
 				PersistenceStoreName: {SQL: &sqliteConfig},
 			},
@@ -176,8 +176,8 @@ func (o *Config) mustGetService(frontendPortOffset int) config.Service {
 		RPC: config.RPC{
 			GRPCPort:        grpcPort,
 			MembershipPort:  membershipPort,
-			BindOnLocalHost: true,
-			BindOnIP:        "",
+			BindOnLocalHost: false,
+			BindOnIP:        "0.0.0.0",
 		},
 	}
 }
