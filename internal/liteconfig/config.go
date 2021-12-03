@@ -171,8 +171,8 @@ func (o *Config) mustGetService(frontendPortOffset int) config.Service {
 		RPC: config.RPC{
 			GRPCPort:        o.FrontendPort + frontendPortOffset,
 			MembershipPort:  o.FrontendPort + 100 + frontendPortOffset,
-			BindOnLocalHost: true,
-			BindOnIP:        "",
+			BindOnLocalHost: false,
+			BindOnIP:        "0.0.0.0",
 		},
 	}
 
