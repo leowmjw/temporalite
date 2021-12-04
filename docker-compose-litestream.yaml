@@ -2,6 +2,8 @@ version: "3.9"
 services:
   temporal:
     container_name: temporal
+    depends_on:
+      - litestream
     environment:
       POSTGRES_PASSWORD: temporal
       POSTGRES_USER: temporal

@@ -19,3 +19,6 @@
 
 # sqlite databases
 *.db
+
+# Ignore Minio output
+data/
