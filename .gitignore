@@ -22,3 +22,15 @@
 
 # Ignore Minio output
 data/
+
+# Ignore LiteStream + Runtime DB
+db
+db-primary/
+db-secondary/
+
+# Ignore Direnv
+.envrc*
+
+# Ignore sensitive LiteStream config
+litestream.yml
+

@@ -22,6 +22,37 @@ Features that align with this goal:
 
 ## Getting Started
 
+### Docker Compose
+Restore DB from S3 (if available) and sync it.  Config assumes below ENV variables defined like in `env-example` and file `litestream.yml`
+
+```bash
+$ make restore
+```
+
+If data corrupted; just clean before re-running above
+
+```bash
+$ make clean
+```
+
+Start Temporalite (in another terminal)
+
+```bash
+$ make litestream
+```
+
+If just standalone without LiteStream backup
+
+```bash
+$ make
+```
+
+Finished
+
+```bash
+$ make stop
+```
+
 ### Download and Start Temporal Server Locally
 
 Build from source using [go install](https://golang.org/ref/mod#go-install):
