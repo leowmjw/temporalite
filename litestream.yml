@@ -1,0 +1,9 @@
+dbs:
+  - path: /opt/temporaldb/data.db
+    replicas:
+      - type: s3
+        bucket: litestream
+        path: data.db
+        endpoint: sgp1.digitaloceanspaces.com
+        region: sgp1
+
