@@ -51,7 +51,7 @@ func NewDefaultConfig() (*Config, error) {
 		Namespaces:       nil,
 		Logger: log.NewZapLogger(log.BuildZapLogger(log.Config{
 			Stdout:     true,
-			Level:      "debug",
+			Level:      "info",
 			OutputFile: "",
 		})),
 		portProvider: &portProvider{},
