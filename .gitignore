@@ -19,3 +19,16 @@
 
 # sqlite databases
 *.db
+
+# Ignore Minio output
+data/
+
+# Ignore Direnv
+.envrc*
+
+# Ignore db-primary
+db-primary
+db-secondary
+db
+
+
