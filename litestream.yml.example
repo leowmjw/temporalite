@@ -1,0 +1,9 @@
+dbs:
+  - path: /opt/temporaldb/data.db
+    replicas:
+      - type: s3
+        bucket: <BUCKET>
+        path: data.db
+        endpoint: <REGION>.digitaloceanspaces.com
+        region: <REGION>
+

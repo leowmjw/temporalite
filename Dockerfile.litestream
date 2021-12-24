@@ -1,26 +1,19 @@
-##### dockerize builder: built from source to support arm & x86 #####
-FROM golang:bullseye AS dockerize-builder
+FROM golang:1.17 as builder
 
-RUN mkdir /build
-WORKDIR /build
+WORKDIR ${GOPATH:-/go}/src/temporalite
 
-# We want to populate the module cache based on the go.{mod,sum} files.
-COPY go.mod .
-COPY go.sum .
-RUN go mod download
 COPY . .
+RUN go mod download
+RUN go get -d -v ./...
 
-RUN go mod graph | awk '{if ($1 !~ "@") print $2}' | xargs go get
-RUN cd cmd/temporalite && go build -o /build/temporalite -v  .
+RUN go build -o ${GOPATH:-/go}/bin/ ${GOPATH:-/go}/src/temporalite/cmd/temporalite
 
-##### base-server target #####
-FROM debian:bullseye-slim AS base-server
+FROM gcr.io/distroless/base-debian11
 
-RUN mkdir /opt/temporal
-WORKDIR /opt/temporal
-COPY --from=dockerize-builder /build/temporalite .
+COPY --from=builder ${GOPATH:-/go}/bin/temporalite /
+EXPOSE 7233
 
 # executable
-ENTRYPOINT ["/opt/temporal/temporalite","start"]
+ENTRYPOINT ["/temporalite", "start"]
 # arguments that can be overridden
-CMD ["--ip","0.0.0.0","-n","default","-f","/opt/temporal/data.db" ]
+CMD ["--ip","0.0.0.0","-n","default","-f","/data.db" ]
