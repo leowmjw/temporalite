@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "temporal"
+  namespace: "temporalite"
+  labels:
+    app.kubernetes.io/name: "temporal"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "temporal"
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: "temporal"
+#      annotations:
+    spec:
+#      securityContext:
+#        fsGroup: 1000 #temporal group
+#        runAsUser: 1000 #temporal user
+#      initContainers:
+#        {{- if $.Values.cassandra.enabled }}
+#        - name: check-cassandra-service
+#          image: busybox
+#          command: ['sh', '-c', 'until nslookup {{ include "cassandra.host" $ }}; do echo waiting for cassandra service; sleep 1; done;']
+#        - name: check-cassandra
+#          image: "{{ $.Values.cassandra.image.repo }}:{{ $.Values.cassandra.image.tag }}"
+#          imagePullPolicy: {{ $.Values.cassandra.image.pullPolicy }}
+#          command: ['sh', '-c', 'until cqlsh {{ include "cassandra.host" $ }} {{ $.Values.cassandra.config.ports.cql }} -e "SHOW VERSION"; do echo waiting for cassandra to start; sleep 1; done;']
+#        - name: check-cassandra-temporal-schema
+#          image: "{{ $.Values.cassandra.image.repo }}:{{ $.Values.cassandra.image.tag }}"
+#          imagePullPolicy: {{ $.Values.cassandra.image.pullPolicy }}
+#          command: ['sh', '-c', 'until cqlsh {{ include "cassandra.host" $ }} {{ $.Values.cassandra.config.ports.cql }} -e "SELECT keyspace_name FROM system_schema.keyspaces" | grep {{ $.Values.server.config.persistence.default.cassandra.keyspace }}$; do echo waiting for default keyspace to become ready; sleep 1; done;']
+#        - name: check-cassandra-visibility-schema
+#          image: "{{ $.Values.cassandra.image.repo }}:{{ $.Values.cassandra.image.tag }}"
+#          imagePullPolicy: {{ $.Values.cassandra.image.pullPolicy }}
+#          command: ['sh', '-c', 'until cqlsh {{ include "cassandra.host" $ }} {{ $.Values.cassandra.config.ports.cql }} -e "SELECT keyspace_name FROM system_schema.keyspaces" | grep {{ $.Values.server.config.persistence.visibility.cassandra.keyspace }}$; do echo waiting for visibility keyspace to become ready; sleep 1; done;']
+#        {{- end }}
+#        {{- if or $.Values.elasticsearch.enabled $.Values.elasticsearch.external }}
+#        - name: check-elasticsearch-index
+#          image: "{{ $.Values.admintools.image.repository }}:{{ $.Values.admintools.image.tag }}"
+#          imagePullPolicy: {{ $.Values.admintools.image.pullPolicy }}
+#          command: ['sh', '-c', 'until curl --silent --fail --user {{ $.Values.elasticsearch.username }}:{{ $.Values.elasticsearch.password }} {{ $.Values.elasticsearch.scheme }}://{{ $.Values.elasticsearch.host }}:{{ $.Values.elasticsearch.port }}/{{ $.Values.elasticsearch.visibilityIndex }} 2>&1 > /dev/null; do echo waiting for elasticsearch index to become ready; sleep 1; done;']
+#        {{- end }}
+#      {{- end }}
+      containers:
+        - name: "temporal"
+          image: "leowmjw/temporalite"
+#          imagePullPolicy: {{ $.Values.server.image.pullPolicy }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+#            - name: ENABLE_ES
+#              value: "{{ or $.Values.elasticsearch.enabled $.Values.elasticsearch.external }}"
+#            - name: ES_SEEDS
+#              value: "{{ $.Values.elasticsearch.host }}"
+#            - name: ES_PORT
+#              value: "{{ $.Values.elasticsearch.port }}"
+#            - name: ES_VERSION
+#              value: "{{ $.Values.elasticsearch.version }}"
+#            - name: ES_SCHEME
+#              value: "{{ $.Values.elasticsearch.scheme }}"
+#            - name: ES_VIS_INDEX
+#              value: "{{ $.Values.elasticsearch.visibilityIndex }}"
+#            - name: ES_USER
+#              value: "{{ $.Values.elasticsearch.username }}"
+#            - name: ES_PWD
+#              value: "{{ $.Values.elasticsearch.password }}"
+#            - name: SERVICES
+#              value: {{ $service }}
+#            - name: TEMPORAL_STORE_PASSWORD
+#              valueFrom:
+#                secretKeyRef:
+#                  name: {{ include "temporal.persistence.secretName" (list $ "default") }}
+#                  key: {{ include "temporal.persistence.secretKey" (list $ "default") }}
+#            - name: TEMPORAL_VISIBILITY_STORE_PASSWORD
+#              valueFrom:
+#                secretKeyRef:
+#                  name: {{ include "temporal.persistence.secretName" (list $ "visibility") }}
+#                  key: {{ include "temporal.persistence.secretKey" (list $ "visibility") }}
+          ports:
+            - name: rpc
+              containerPort: 7233
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          livenessProbe:
+             initialDelaySeconds: 150
+             tcpSocket:
+               port: rpc
+#          volumeMounts:
+#            - name: config
+#              mountPath: /etc/temporal/config/config_template.yaml
+#              subPath: config_template.yaml
+#            - name: dynamic-config
+#              mountPath: /etc/temporal/dynamic_config
+#            {{- if $.Values.server.additionalVolumeMounts }}
+#            {{- toYaml $.Values.server.additionalVolumeMounts | nindent 12}}
+#            {{- end }}
+#          resources:
+#            {{- toYaml (default $.Values.server.resources $serviceValues.resources) | nindent 12 }}
+
+#      volumes:
+#        - name: config
+#          configMap:
+#            name: "{{ include "temporal.fullname" $ }}-config"
+#        - name: dynamic-config
+#          configMap:
+#            name: "{{ include "temporal.fullname" $ }}-dynamic-config"
+#            items:
+#            - key: dynamic_config.yaml
+#              path: dynamic_config.yaml
+#
